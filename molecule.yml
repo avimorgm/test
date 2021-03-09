@@ -36,7 +36,7 @@ provisioner:
   name: ansible
   options:
     extra-vars:
-      content: Hello World!
+      content: Hello, World!
   config_options:
     defaults:
       interpreter_python: auto_silent
