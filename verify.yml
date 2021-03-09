@@ -1,0 +1,78 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  vars:
+    expected_content: "Hello, World!"
+  tasks:
+  - name: Get index.html ubuntu
+    uri:
+      url: http://localhost:8082
+      return_content: yes
+    when: ansible_os_family == "Debian"
+    register: this
+    failed_when: "expected_content not in this.content"
+    delegate_to: localhost
+
+  - name: Get index.html centos
+    uri:
+      url: http://localhost:8080
+      return_content: yes
+    when: ansible_os_family == "RedHat"
+    register: this2
+    failed_when: "expected_content not in this2.content"
+    delegate_to: localhost
+
+  - name: Get index.html ubuntu
+    uri:
+      url: http://localhost:8082
+      return_content: yes
+    when: 
+    - ansible_os_family == "Debian"
+    - content is defined
+    register: this
+    failed_when: "content not in this.content"
+    delegate_to: localhost
+  
+  - name: Get index.html centos
+    uri:
+      url: http://localhost:8080
+      return_content: yes
+    when: 
+    - ansible_os_family == "RedHat"
+    - content is defined
+    register: this2
+    failed_when: "content not in this2.content"
+    delegate_to: localhost
+
+  - name: Debug results ubuntu
+    debug:
+      var: this.content
+    delegate_to: localhost
+    when:
+    - ansible_os_family == "Debian"
+
+  - name: Debug results centos
+    debug:
+      var: this2.content
+    delegate_to: localhost
+    when:
+    - ansible_os_family == "RedHat"
+
+  - name: Debug results when extra vars is defained ubuntu
+    debug:
+      var: this.content
+    delegate_to: localhost
+    when:
+    - ansible_os_family == "Debian"
+    - content is defined
+
+  - name: Debug results when extra vars is defained centos
+    debug:
+      var: this.content
+    delegate_to: localhost
+    when:
+    - ansible_os_family == "Debian"
+    - content is defined
+
